@@ -8,12 +8,13 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import jakarta.annotation.Nullable;
-import jakarta.annotation.PostConstruct;
+
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -26,6 +27,7 @@ import java.util.regex.Pattern;
 public class TgBotUpdatesListener implements UpdatesListener {
 
     private final Logger logger = LoggerFactory.getLogger(TgBotUpdatesListener.class);
+    private final TelegramBot telegramBot;
 
     private final Pattern pattern = Pattern.compile("" +
             "(\\d{1,2}\\.\\d{2}\\.\\d{4} \\d{1,2}:\\d{2})\\s+" +
@@ -33,18 +35,17 @@ public class TgBotUpdatesListener implements UpdatesListener {
 
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-    private final TelegramBot bot;
 
     private final NotificationTaskService notificationTaskService ;
 
-    public TgBotUpdatesListener(TelegramBot bot, NotificationTaskService notificationTaskService) {
-        this.bot = bot;
+    public TgBotUpdatesListener(TelegramBot telegramBot, NotificationTaskService notificationTaskService) {
+        this.telegramBot = telegramBot;
         this.notificationTaskService = notificationTaskService;
     }
 
     @PostConstruct
     public void init() {
-        bot.setUpdatesListener(this);
+        telegramBot.setUpdatesListener(this);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class TgBotUpdatesListener implements UpdatesListener {
 
     private void sendMessage(Long chatId, String message) {
         SendMessage sendMessage = new SendMessage(chatId, message);
-        SendResponse sendResponse = bot.execute(sendMessage);
+        SendResponse sendResponse = telegramBot.execute(sendMessage);
         if (!sendResponse.isOk()) {
             logger.error("Error during sending message: {}", sendResponse.description());
         } else if (message != null) {

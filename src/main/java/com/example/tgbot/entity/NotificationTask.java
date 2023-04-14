@@ -1,7 +1,7 @@
 package com.example.tgbot.entity;
 
-import jakarta.persistence.*;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,11 +11,11 @@ public class NotificationTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
+    @Column(nullable = false)
     private String message;
-
+    @Column(nullable = false, name = "chat_id")
     private long chatId;
-
+    @Column(nullable = false, name = "notification_date_time")
     private LocalDateTime notificationDateTime;
 
     public void setId(long id) {
