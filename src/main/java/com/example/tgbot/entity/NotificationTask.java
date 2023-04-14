@@ -1,6 +1,5 @@
 package com.example.tgbot.entity;
 
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -49,5 +48,4 @@ public class NotificationTask {
     public LocalDateTime getNotificationDateTime(){
         return notificationDateTime;
     }
-
 }

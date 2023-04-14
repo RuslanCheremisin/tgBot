@@ -7,4 +7,5 @@ CREATE TABLE notification_tasks(
     message TEXT NOT NULL ,
     chat_id BIGINT NOT NULL,
     notification_date_time TIMESTAMP NOT NULL
+
 );

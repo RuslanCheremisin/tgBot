@@ -42,7 +42,6 @@ public class TgBotUpdatesListener implements UpdatesListener {
         this.telegramBot = telegramBot;
         this.notificationTaskService = notificationTaskService;
     }
-
     @PostConstruct
     public void init() {
         telegramBot.setUpdatesListener(this);
