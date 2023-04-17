@@ -10,11 +10,11 @@ public class NotificationTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String message;
-    @Column(nullable = false, name = "chat_id")
+//    @Column(nullable = false, name = "chat_id")
     private long chatId;
-    @Column(nullable = false, name = "notification_date_time")
+//    @Column(nullable = false, name = "notification_date_time")
     private LocalDateTime notificationDateTime;
 
     public void setId(long id) {
@@ -48,4 +48,5 @@ public class NotificationTask {
     public LocalDateTime getNotificationDateTime(){
         return notificationDateTime;
     }
+
 }

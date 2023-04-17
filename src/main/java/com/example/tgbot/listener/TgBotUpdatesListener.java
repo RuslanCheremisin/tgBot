@@ -36,12 +36,13 @@ public class TgBotUpdatesListener implements UpdatesListener {
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
 
-    private final NotificationTaskService notificationTaskService ;
+    private final NotificationTaskService notificationTaskService;
 
     public TgBotUpdatesListener(TelegramBot telegramBot, NotificationTaskService notificationTaskService) {
         this.telegramBot = telegramBot;
         this.notificationTaskService = notificationTaskService;
     }
+
     @PostConstruct
     public void init() {
         telegramBot.setUpdatesListener(this);
@@ -50,7 +51,7 @@ public class TgBotUpdatesListener implements UpdatesListener {
     @Override
     public int process(List<Update> updates) {
         try {
-            updates.stream().filter(update ->update.message()!=null).forEach(update -> {
+            updates.stream().filter(update -> update.message() != null).forEach(update -> {
                 logger.info("Handles update: {}", update);
                 Message message = update.message();
                 Long chatId = message.chat().id();
@@ -61,12 +62,25 @@ public class TgBotUpdatesListener implements UpdatesListener {
                             Я помогу тебе запланировать задачу.
                             Отправь её в формате: 13.04.2023 12:00 Сделать домашку
                             """);
+                } else if (message != null) {
+                    Matcher matcher = pattern.matcher(text);
+                    if (matcher.find()) {
+                        LocalDateTime dateTime = parse(matcher.group(1));
+                        if (Objects.isNull(dateTime)) {
+                            sendMessage(chatId, "Некорректный формат даты и/или времени");
+                        } else {
+                            String txt = matcher.group(2);
+                            NotificationTask notificationTask = new NotificationTask();
+                            notificationTask.setMessage(txt);
+                            notificationTask.setChatId(chatId);
+                            notificationTask.setNotificationDateTime(dateTime);
+                            notificationTaskService.save(notificationTask);
+                            sendMessage(chatId, "Задача на " + dateTime + " успешно добавлена!");
+                        }
+                    } else {
+                        sendMessage(chatId, "Некорректный формат сообщения");
+                    }
                 }
-//                if ("/wave".equals(text)) {
-//                    SendAudio sendAudio = new SendAudio(chatId, new File("C:\\Users\\rus\\Downloads\\Evanescence - Discography - 1998-2018\\Albums (CD)\\2000 - Origin - (320 kbps)\\01. Origin.mp3"));
-//                    bot.execute(sendAudio);
-//                }
-
             });
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -79,23 +93,6 @@ public class TgBotUpdatesListener implements UpdatesListener {
         SendResponse sendResponse = telegramBot.execute(sendMessage);
         if (!sendResponse.isOk()) {
             logger.error("Error during sending message: {}", sendResponse.description());
-        } else if (message != null) {
-            Matcher matcher = pattern.matcher(message);
-            if (matcher.find()) {
-                LocalDateTime dateTime = parse(matcher.group(1));
-                if (Objects.isNull(dateTime)) {
-                    sendMessage(chatId, "Некорректный формат даты и/или времени");
-                } else {
-                    String txt = matcher.group(2);
-                    NotificationTask notificationTask = new NotificationTask();
-                    notificationTask.setMessage(txt);
-                    notificationTask.setChatId(chatId);
-                    notificationTask.setNotificationDateTime(dateTime);
-                    notificationTaskService.save(notificationTask);
-                }
-            } else {
-                sendMessage(chatId, "Некорректный формат сообщения");
-            }
         }
     }
 
